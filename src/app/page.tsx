@@ -1,6 +1,5 @@
 import React from 'react';
 import MidiDetector from "@/components/midi-detector"
-import Button from '../components/button'; // Correct import path for Button component
 
 export default function Home() {
   return (
