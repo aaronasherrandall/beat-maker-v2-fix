@@ -28,11 +28,10 @@ interface ButtonProps {
  *
  * @returns {JSX.Element} The rendered button component.
  */
-const Button: React.FC<ButtonProps> = ({ onClick, label, disabled = false, number, color}) => {
+const Button: React.FC<ButtonProps> = ({ onClick, label, disabled = false, number, color }) => {
   return (
-    <button onClick={onClick} disabled={disabled} className={`flex flex-col px-4 py-2 ${Colors[color || 0]} text-white rounded-md mb-4 mx-2`}
-    number={number}>
-      {label} {/** This only renders the text in the element  */}
+    <button onClick={onClick} disabled={disabled} className={`flex flex-col px-4 py-2 ${Colors[color || 0]} text-white rounded-md mb-4 mx-2`}>
+      {label} {number !== undefined && <span>{number}</span>}
     </button>
   );
 };
