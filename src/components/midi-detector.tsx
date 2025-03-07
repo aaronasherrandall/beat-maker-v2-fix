@@ -29,7 +29,8 @@ export default function MidiDetector() {
   }, []);
 
   const playNote = () => {
-    if (polySynth.current) {
+    // Only play a note if the polySynth is initialized and midi is enabled
+    if (polySynth.current && midiEnabled) {
       polySynth.current.triggerAttackRelease("C4", "8n");
       console.log("🎵 Playing Note: C4");
     } else {
@@ -62,7 +63,11 @@ export default function MidiDetector() {
           setMidiDevice(midiDevice.name || "Unknown MIDI Device");
           console.log(`🎹 Found Focusrite MIDI Device: ${midiDevice.name}`);
 
-          midiDevice.onmidimessage = handleMIDIMessage;
+
+          inputs.forEach((device) => {
+            console.log(`🎹 Assigning MIDI Input: ${device.name} (ID: ${device.id})`);
+            device.onmidimessage = handleMIDIMessage;
+          });
 
           // Listen for device connection changes
           midiAccess.onstatechange = (event) => {
@@ -101,12 +106,19 @@ export default function MidiDetector() {
   };
 
   const handleMIDIMessage = (event: WebMidi.MIDIMessageEvent) => {
-    console.log("🎼 MIDI message received:", event.data);
     const [command, note, velocity] = event.data;
+    console.log("🎼 RAW MIDI Message Received:", event.data);
+
+    if (!polySynth.current) return;
+
     if (command === 144 && velocity > 0) {
-      polySynth.triggerAttack(Tone.Frequency(note, "midi").toFrequency());
+      // Note ON
+      console.log(`🎵 Note ON: ${note}`);
+      polySynth.current.triggerAttack(Tone.Frequency(note, "midi").toFrequency());
     } else if (command === 128 || (command === 144 && velocity === 0)) {
-      polySynth.triggerRelease(Tone.Frequency(note, "midi").toFrequency());
+      // Note OFF
+      console.log(`🎵 Note OFF: ${note}`);
+      polySynth.current.triggerRelease(Tone.Frequency(note, "midi").toFrequency());
     }
   };
 
@@ -148,7 +160,7 @@ export default function MidiDetector() {
             )}
             <div>
               <button onClick={playNote} className="px-4 py-2 my-2 bg-blue-500 text-white rounded-md">
-                Test Audio
+                Test Audio Only
              </button>
             </div>
           </div>
